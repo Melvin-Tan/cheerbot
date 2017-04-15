@@ -38,14 +38,16 @@ def on_chat_message(msg):
 	chat_id = msg['chat']['id']
 	if msg['text'] == '/update':
 		if chat_id != EXCO_CHAT_ID:
-			bot.sendMessage(chat_id, "OI, mai lai. No permission to see.")
+			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to see.")
 		else:
 			# Prompt them to select a date (buttons)
 			# Give attendance for that date
 			bot.sendMessage(chat_id, "No updates yet. Wait long long")
 	elif msg['text'] == '/set_training':
-		if user_id != CAPTAIN_USER_ID or (not chat_id in [CAPTAIN_USER_ID, EXCO_CHAT_ID]):
-			bot.sendMessage(chat_id, "OI, mai lai. No permission to set training.")
+		if user_id != CAPTAIN_USER_ID:
+			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to set training.")
+		elif chat_id in [TITANS_CHAT_ID, EXCO_CHAT_ID]:
+			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + ", cannot set training in group chat lah. Click @ke_cheer_bot and set training there.")
 		else:
 			# Bot will collect info from Captain about dates and training_type
 			# In Titans chat, bot will announce training, click on him to confirm.
@@ -67,7 +69,7 @@ def on_chat_message(msg):
 
 # Obtain a callback query and handle it accordingly
 def on_callback_query(msg):
-	# pprint(msg)
+	pprint(msg)
 	msg_id = msg['message']['message_id']
 	query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
 	if query_data.startswith('/set_training'):
