@@ -24,11 +24,6 @@ CAPTAIN_USER_ID = 165100852
 temp_messages = []
 db = Cheerbot_DB()
 db.setup()
-
-# Reading json file
-def read_json(filename):
-    datafile = open(filename, 'r',  encoding='utf-8')
-    return json.loads(datafile.read())
  
 # CS1010S Facebok Group Data as a dictionary object
 #bot_data = read_json('cs1010s-fbdata.json')
