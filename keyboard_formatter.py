@@ -1,7 +1,7 @@
 import math
 
 def format(text_list, callback_data_list = [], ncols = 1):
-	nrows = math.ceil(len(text_list) / ncols)
+	nrows = int(math.ceil(len(text_list) / ncols))
 	result = []
 	for i in range(nrows):
 		row_result = []
