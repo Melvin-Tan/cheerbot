@@ -39,12 +39,19 @@ def on_chat_message(msg):
 	user_id = msg['from']['id']
 	chat_id = msg['chat']['id']
 	if msg['text'] == '/update':
-		if chat_id != EXCO_CHAT_ID:
+		if chat_id != EXCO_CHAT_ID and user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to see.")
 		else:
 			# Prompt them to select a date (buttons)
 			# Give attendance for that date
-			bot.sendMessage(chat_id, "No updates yet. Wait long long")
+			upcoming_trainings = db.get_upcoming_trainings()
+			if len(upcoming_trainings) == 0:
+				bot.sendMessage(user_id, 'No available trainings leh...')
+				return
+			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
+			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
+			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/update ' + str(training_id) for training_id in training_ids], ncols=1))
+			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
 	elif msg['text'] == '/set_training':
 		if user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to set training.")
@@ -62,22 +69,26 @@ def on_chat_message(msg):
 		else:
 			# Bot will collect more info from user about dates
 			upcoming_trainings = db.get_upcoming_trainings()
+			if len(upcoming_trainings) == 0:
+				bot.sendMessage(user_id, 'No available trainings leh...')
+				return
 			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
 			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/can_go ' + str(training_id) for training_id in training_ids], ncols=1))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
-			# bot.sendMessage(chat_id, "Yay, you're coming!")
 	elif msg['text'] == '/cant_go':
 		if msg['chat']['type'] != 'private':
 			bot.sendMessage(chat_id, "Please click on me (@ke_cheer_bot) and send your reply there instead.")
 		else:
 			# Bot will collect more info from user about dates and reason
 			upcoming_trainings = db.get_upcoming_trainings()
+			if len(upcoming_trainings) == 0:
+				bot.sendMessage(user_id, 'No available trainings leh...')
+				return
 			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/can_go ' + str(training_id) for training_id in training_ids], ncols=1))
+			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/cant_go ' + str(training_id) for training_id in training_ids], ncols=1))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
-			# bot.sendMessage(chat_id, "Nuuuuuuuuuu... T.T")
 
 # Obtain a callback query and handle it accordingly
 def on_callback_query(msg):
@@ -161,11 +172,28 @@ def on_callback_query(msg):
 		else:
 			# Throw error
 			pass
+		bot.answerCallbackQuery(query_id, text='Selected: ' + query_data.split(' ')[-1])
 	elif query_data.startswith('/can_go'):
-		pass
+		edit_previous_temp_message_id(from_id, 'Going for this training.')
+		db.add_or_update_attendance(msg)
+		bot.answerCallbackQuery(query_id, text='Training date is chosen.')
+		bot.sendMessage(from_id, "Yay, you're coming! :D")
 	elif query_data.startswith('/cant_go'):
-		pass
-	bot.answerCallbackQuery(query_id, text='Selected: ' + query_data.split(' ')[-1])
+		edit_previous_temp_message_id(from_id, 'Not going for this training.')
+		db.add_or_update_attendance(msg)
+		bot.answerCallbackQuery(query_id, text='Training date is chosen.')
+		bot.sendMessage(from_id, "Nuuuuuuuuuu... T.T Cya next training then!")
+		# markup = ForceReply()
+		# training_id = query_data.split(' ')[-1]
+		# temp_unattendance.append((training_id, from_id))
+		# temp_messages.append(bot.sendMessage(from_id, 'Please provide a reason', reply_markup = markup))
+	elif query_data.startswith('/update'):
+		# edit_previous_temp_message_id(from_id, 'Training date is chosen.')
+		bot.answerCallbackQuery(query_id, text='Training date is chosen.')
+		training_id = query_data.split(' ')[1]
+		training_details = db.find_training(training_id)[0]
+		attendances = db.get_attendances(training_id)
+		bot.sendMessage(TITANS_CHAT_ID, training.get_attendance_details(db, training_details, attendances))
 
 def edit_previous_temp_message_id(from_id, new_text):
 	message = get_previous_temp_message(from_id)

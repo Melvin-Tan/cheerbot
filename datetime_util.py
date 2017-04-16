@@ -13,14 +13,14 @@ def get_local_datetime(unix_date):
 	return datetime.datetime.fromtimestamp(unix_date).strftime('%d-%m-%Y %H:%M:%S')
 
 def get_time_from_datetime(datetime):
-	return str(datetime.hour) + '.' + datetime.strftime('%M%p')
+	return str(datetime.hour % 12) + ':' + datetime.strftime('%M%p')
 
 def get_time_from_time(time):
 	hour = int(time[:2])
 	minute = time[2:]
 	am_or_pm = 'AM' if hour < 12 else 'PM'
 	hour = hour % 12
-	return str(hour) + '.' + minute + am_or_pm
+	return str(hour) + ':' + minute + am_or_pm
 
 # Get the date for a given day and month
 def get_datetime(day, month, time):
