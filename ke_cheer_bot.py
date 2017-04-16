@@ -22,7 +22,7 @@ TITANS_CHAT_ID = -219149765 # This is actually exco chat.
 CAPTAIN_USER_ID = 165100852
 temp_messages = []
 db = Cheerbot_DB()
-db.drop_tables() # Turn this off in production
+# db.drop_tables() # Turn this off in production
 db.setup()
 
 # Obtain a chat message and handle it accordingly
@@ -185,7 +185,8 @@ def on_callback_query(msg):
 		training_id = query_data.split(' ')[1]
 		training_details = db.find_training(training_id)[0]
 		attendances = db.get_attendances(training_id)
-		bot.sendMessage(TITANS_CHAT_ID, training.get_attendance_details(db, training_details, attendances))
+		no_reply_user_ids = db.get_no_reply_user_ids(training_id)
+		bot.sendMessage(TITANS_CHAT_ID, training.get_attendance_details(db, training_details, attendances, no_reply_user_ids))
 
 def edit_previous_temp_message_id(from_id, new_text):
 	message = get_previous_temp_message(from_id)

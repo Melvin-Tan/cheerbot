@@ -20,12 +20,23 @@ def get_chat_training_details(split_data):
 		+ 'Lastly, do remember to indicate attendance by clicking on me (@ke_cheer_bot) and type /can_go or /cant_go.\n\n' \
 		+ 'Cya! :D'
 
-def get_attendance_details(db, training, attendances):
+def get_attendance_details(db, training, attendances, no_reply_user_ids):
 	return training[4] + ' on ' + get_datetime(training) + ' in ' + training[1] + '\n\n' \
+		+ 'No reply:\n' \
+		+ get_no_reply_members(db, no_reply_user_ids) + '\n' \
 		+ 'Not Coming:\n' \
 		+ get_not_coming_members(db, attendances) + '\n' \
 		+ 'Coming:\n' \
 		+ get_coming_members(db, attendances)
+
+def get_no_reply_members(db, no_reply_user_ids):
+	result = ''
+	list_index = 1
+	for user_id in no_reply_user_ids:
+		user = db.find_user(user_id[0])[0]
+		result += str(list_index) + '. ' + user[2] + '(@' + user[1] + ')\n'
+		list_index += 1
+	return result if list_index > 1 else 'None\n'
 
 def get_coming_members(db, attendances):
 	result = ''

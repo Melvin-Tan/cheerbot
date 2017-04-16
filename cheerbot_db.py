@@ -98,6 +98,11 @@ class Cheerbot_DB:
 		args = (training_id,)
 		return [x for x in self.conn.execute(statement, args)]
 
+	def get_no_reply_user_ids(self, training_id):
+		statement = 'SELECT user_id FROM users EXCEPT SELECT user_id FROM attendances WHERE training_id = (?)'
+		args = (training_id,)
+		return [x for x in self.conn.execute(statement, args)]
+
 	def add_attendance(self, training_id, user_id, coming):
 		statement = 'INSERT INTO attendances (training_id, user_id, coming) ' \
 			+ ' VALUES (?, ?, ?)'
