@@ -40,7 +40,7 @@ def on_chat_message(msg):
 			# Give attendance for that date
 			upcoming_trainings = db.get_upcoming_trainings()
 			if len(upcoming_trainings) == 0:
-				bot.sendMessage(user_id, 'No available trainings leh...')
+				bot.sendMessage(chat_id, 'No available trainings leh...')
 				return
 			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
