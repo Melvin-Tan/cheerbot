@@ -1,4 +1,0 @@
-can_go - To indicate you can go training
-cant_go - To indicate you can't go training
-set_training - For captain to set training dates
-update - For admin to get attendance of everyone
