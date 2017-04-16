@@ -1,6 +1,6 @@
 from pprint import pprint
-
-import datetime_formatter
+from cheerbot_db import Cheerbot_DB
+import datetime_util
 import json
 import keyboard_formatter
 import sys
@@ -22,6 +22,8 @@ EXCO_CHAT_ID = -219149765
 TITANS_CHAT_ID = -219149765 # This is actually exco chat.
 CAPTAIN_USER_ID = 165100852
 temp_messages = []
+db = Cheerbot_DB()
+db.setup()
 
 # Reading json file
 def read_json(filename):
@@ -59,17 +61,27 @@ def on_chat_message(msg):
 			bot.sendMessage(chat_id, "Please click on me (@ke_cheer_bot) and send your reply there instead.")
 		else:
 			# Bot will collect more info from user about dates
-			bot.sendMessage(chat_id, "Yay, you're coming!")
+			upcoming_trainings = db.get_upcoming_trainings()
+			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
+			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
+			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/can_go ' + str(training_id) for training_id in training_ids], ncols=1))
+			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
+			# bot.sendMessage(chat_id, "Yay, you're coming!")
 	elif msg['text'] == '/cant_go':
 		if msg['chat']['type'] != 'private':
 			bot.sendMessage(chat_id, "Please click on me (@ke_cheer_bot) and send your reply there instead.")
 		else:
 			# Bot will collect more info from user about dates and reason
-			bot.sendMessage(chat_id, "Nuuuuuuuuuu... T.T")
+			upcoming_trainings = db.get_upcoming_trainings()
+			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
+			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
+			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/can_go ' + str(training_id) for training_id in training_ids], ncols=1))
+			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
+			# bot.sendMessage(chat_id, "Nuuuuuuuuuu... T.T")
 
 # Obtain a callback query and handle it accordingly
 def on_callback_query(msg):
-	pprint(msg)
+	# pprint(msg)
 	msg_id = msg['message']['message_id']
 	query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
 	if query_data.startswith('/set_training'):
@@ -79,55 +91,80 @@ def on_callback_query(msg):
 			# /set_training <training_type>
 			# Select venue
 			venues = ['Communal', 'Dining', 'Tennis', 'Others']
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(venues, callback_data_list=[query_data + ' ' + venue for venue in venues], ncols=2))
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(venues, \
+					callback_data_list=[query_data + ' ' + venue for venue in venues], \
+				ncols=2))
 			temp_messages.append(bot.sendMessage(from_id, 'Please choose a venue', reply_markup = markup))
 		elif len(split_data) == 3:
 			edit_previous_temp_message_id(from_id, 'Venue is set.')
 			# /set_training <training_type> <venue>
 			# Select month
 			months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(months, callback_data_list=[query_data + ' ' + month for month in months], ncols=4))
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(months, \
+					callback_data_list=[query_data + ' ' + month for month in months], \
+				ncols=4))
 			temp_messages.append(bot.sendMessage(from_id, 'Please choose a month', reply_markup = markup))
 		elif len(split_data) == 4:
 			edit_previous_temp_message_id(from_id, 'Month is set.')
 			# /set_training <training_type> <venue> <month>
 			# Select day-of-month
 			month = split_data[-1]
-			days = [str(i) for i in range(datetime_formatter.first_valid_day_of(month), datetime_formatter.last_day_of(month) + 1)]
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(days, callback_data_list=[query_data + ' ' + day for day in days], ncols=7))
-			temp_messages.append(bot.sendMessage(from_id, 'Please choose a day\nFirst column is ' + datetime_formatter.first_valid_day_of_week(month), reply_markup = markup))
+			days = [str(i) for i in range(datetime_util.first_valid_day_of(month), datetime_util.last_day_of(month) + 1)]
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(days, \
+					callback_data_list=[query_data + ' ' + day for day in days], \
+				ncols=7))
+			temp_messages.append(bot.sendMessage(from_id, 'Please choose a day\nFirst column is ' + datetime_util.first_valid_day_of_week(month), reply_markup = markup))
 		elif len(split_data) == 5:
 			edit_previous_temp_message_id(from_id, 'Day is set.')
 			# /set_training <training_type> <venue> <month> <day>
 			# Select start time
 			timings = ['1900', '1930', '2000', '2030', '2100', '2130', '2200']
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(timings, callback_data_list=[query_data + ' ' + timing for timing in timings], ncols=2))
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(timings, \
+					callback_data_list=[query_data + ' ' + timing for timing in timings], \
+				ncols=2))
 			temp_messages.append(bot.sendMessage(from_id, 'Please choose a start time', reply_markup = markup))
 		elif len(split_data) == 6:
 			edit_previous_temp_message_id(from_id, 'Start time is set.')
 			# /set_training <training_type> <venue> <month> <day> <start_time>
 			# Select duration
-			durations = ['1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5', '5.5']
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(durations, callback_data_list=[query_data + ' ' + duration for duration in durations], ncols=2))
-			temp_messages.append(bot.sendMessage(from_id, 'Please choose a duration (in hours)', reply_markup = markup))
+			timings = ['2100', '2130', '2200', '2230', '2300', '2330', '0000']
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(timings, \
+					callback_data_list=[query_data + ' ' + timing for timing in timings], \
+				ncols=2))
+			temp_messages.append(bot.sendMessage(from_id, 'Please choose an end time', reply_markup = markup))
 		elif len(split_data) == 7:
-			edit_previous_temp_message_id(from_id, 'Duration is set.')
-			# /set_training <training_type> <venue> <month> <day> <start_time> <duration>
+			edit_previous_temp_message_id(from_id, 'End time is set.')
+			# /set_training <training_type> <venue> <month> <day> <start_time> <end_time>
 			# Select confirmation (YES/NO)
 			confirmations = ['Yes', 'No']
-			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(confirmations, callback_data_list=[query_data + ' ' + confirmation for confirmation in confirmations], ncols=2))
+			markup = InlineKeyboardMarkup( \
+				inline_keyboard=keyboard_formatter.format(confirmations, \
+					callback_data_list=[query_data + ' ' + confirmation for confirmation in confirmations], \
+				ncols=2))
 			temp_messages.append(bot.sendMessage(from_id, 'Please confirm the following details:\n' + training.get_training_details(split_data), reply_markup = markup))
 		elif len(split_data) == 8:
 			edit_previous_temp_message_id(from_id, 'Confirmation is set.')
-			# /set_training <training_type> <venue> <month> <day> <start_time> <duration> <YES/NO>
+			# /set_training <training_type> <venue> <month> <day> <start_time> <end_time> <YES/NO>
 			if split_data[-1] == 'No':
 				bot.answerCallbackQuery(query_id, text='Training details is not saved. Please redo if needed.')
 			else:
-				# ADD TRAINING TO DATABASE
+				training_tuple = training.get_training(split_data)
+				db.add_training(training_tuple[0], training_tuple[1], training_tuple[2], training_tuple[3])
 				bot.answerCallbackQuery(query_id, text='Training details is saved and sent to Titans Chat')
+				bot.sendMessage(TITANS_CHAT_ID, training.get_chat_training_details(split_data))
+				return
 		else:
 			# Throw error
 			pass
+	elif query_data.startswith('/can_go'):
+		pass
+	elif query_data.startswith('/cant_go'):
+		pass
 	bot.answerCallbackQuery(query_id, text='Selected: ' + query_data.split(' ')[-1])
 
 def edit_previous_temp_message_id(from_id, new_text):

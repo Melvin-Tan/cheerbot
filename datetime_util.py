@@ -1,8 +1,37 @@
 import datetime
 
+"""
+Args example format
+  day: 19
+month: 'Jul'
+ year: 2017
+ time: '2030'
+"""
+
 # Convert UNIX date to human-readable datetime string
 def get_local_datetime(unix_date):
 	return datetime.datetime.fromtimestamp(unix_date).strftime('%d-%m-%Y %H:%M:%S')
+
+def get_time_from_datetime(datetime):
+	return str(datetime.hour) + '.' + datetime.strftime('%M%p')
+
+def get_time_from_time(time):
+	hour = int(time[:2])
+	minute = time[2:]
+	am_or_pm = 'AM' if hour < 12 else 'PM'
+	hour = hour % 12
+	return str(hour) + '.' + minute + am_or_pm
+
+# Get the date for a given day and month
+def get_datetime(day, month, time):
+	return datetime.datetime(get_year(day, month), to_numeric_month(month), int(day), int(time[:2]), int(time[2:]))
+
+# Get the year for a given day and month
+def get_year(day, month):
+	today = datetime.date.today()
+	month_numeric = to_numeric_month(month)
+	date = datetime.date(today.year, month_numeric, int(day))
+	return date.year + 1 if (date < today) else date.year
 
 # Get the first valid day of a given month
 def first_valid_day_of(month):
@@ -44,3 +73,8 @@ def is_leap_year(year):
 def to_numeric_month(month):
 	months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 	return months.index(month) + 1
+
+# Convert month in number to string
+def to_string_month(month_number):
+	months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+	return months[month_number - 1]
