@@ -22,10 +22,8 @@ TITANS_CHAT_ID = -219149765 # This is actually exco chat.
 CAPTAIN_USER_ID = 165100852
 temp_messages = []
 db = Cheerbot_DB()
+db.drop_tables() # Turn this off in production
 db.setup()
- 
-# CS1010S Facebok Group Data as a dictionary object
-#bot_data = read_json('cs1010s-fbdata.json')
 
 # Obtain a chat message and handle it accordingly
 def on_chat_message(msg):

@@ -5,6 +5,15 @@ class Cheerbot_DB:
 		self.db_name = db_name
 		self.conn = sqlite3.connect(db_name, check_same_thread = False)
 
+	def drop_tables(self):
+		training_table = 'DROP TABLE IF EXISTS trainings'
+		user_table = 'DROP TABLE IF EXISTS users'
+		attendance_table = 'DROP TABLE IF EXISTS attendances'
+		self.conn.execute(attendance_table)
+		self.conn.execute(training_table)
+		self.conn.execute(user_table)
+		self.conn.commit()
+
 	def setup(self):
 		training_table = 'CREATE TABLE IF NOT EXISTS trainings (' \
 			+ 'training_id integer, ' \
@@ -109,7 +118,9 @@ class Cheerbot_DB:
 		# Handle user
 		chat = msg['message']['chat']
 		user_id = chat['id']
-		self.add_or_update_user(user_id, chat['username'], chat['first_name'])
+		user_name = chat['username'] if 'username' in chat else ''
+		name = chat['first_name'] if 'first_name' in chat else ''
+		self.add_or_update_user(user_id, user_name, name)
 		# Handle attendance
 		if len(self.find_attendance(training_id, user_id)) == 0:
 			self.add_attendance(training_id, user_id, can_attend)

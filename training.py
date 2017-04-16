@@ -35,7 +35,7 @@ def get_coming_members(db, attendances):
 			user = db.find_user(attendance[1])[0]
 			result += str(list_index) + '. ' + user[2] + ' (@' + user[1] + ')\n'
 			list_index += 1
-	return result if list_index > 1 else 'None yet'
+	return result if list_index > 1 else 'None yet\n'
 
 def get_not_coming_members(db, attendances):
 	result = ''
@@ -45,7 +45,7 @@ def get_not_coming_members(db, attendances):
 			user = db.find_user(attendance[1])[0]
 			result += str(list_index) + '. ' + user[2] + ' (@' + user[1] + ')\n'
 			list_index += 1
-	return result if list_index > 1 else 'None yet'
+	return result if list_index > 1 else 'None yet\n'
 
 def get_training(split_data):
 	command, training_type, venue, month, day, start_time, end_time, confirmation = split_data
