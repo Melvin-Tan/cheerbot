@@ -186,7 +186,7 @@ def on_callback_query(msg):
 		training_details = db.find_training(training_id)[0]
 		attendances = db.get_attendances(training_id)
 		no_reply_user_ids = db.get_no_reply_user_ids(training_id)
-		bot.sendMessage(TITANS_CHAT_ID, training.get_attendance_details(db, training_details, attendances, no_reply_user_ids))
+		bot.sendMessage(EXCO_CHAT_ID, training.get_attendance_details(db, training_details, attendances, no_reply_user_ids))
 
 def edit_previous_temp_message_id(from_id, new_text):
 	message = get_previous_temp_message(from_id)
