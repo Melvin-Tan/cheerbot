@@ -18,7 +18,7 @@ import training
 
 bot = telepot.Bot('379881150:AAG2jacR7YBD_t2lc1v4RogoR-RCe09z6PU')
 EXCO_CHAT_ID = -219149765
-TITANS_CHAT_ID = -219149765 # This is actually exco chat.
+TITANS_CHAT_ID = -198395968
 CAPTAIN_USER_ID = 165100852
 temp_messages = []
 db = Cheerbot_DB()

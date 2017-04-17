@@ -54,7 +54,7 @@ class Cheerbot_DB:
 		return [x for x in self.conn.execute(statement, args)]
 
 	def get_upcoming_trainings(self):
-		statement = "SELECT * FROM trainings WHERE datetime('now') < end_datetime"
+		statement = "SELECT * FROM trainings WHERE datetime('now') < end_datetime ORDER BY start_datetime"
 		return [x for x in self.conn.execute(statement)]
 
 	def find_user(self, user_id):
