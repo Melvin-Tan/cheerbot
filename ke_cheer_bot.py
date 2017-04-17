@@ -30,7 +30,7 @@ def on_chat_message(msg):
 	# pprint(msg)
 	user_id = msg['from']['id']
 	chat_id = msg['chat']['id']
-	if msg['text'] == '/update':
+	if msg['text'].startswith('/update'):
 		if chat_id != EXCO_CHAT_ID and user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to see.")
 		else:
@@ -44,7 +44,7 @@ def on_chat_message(msg):
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
 			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/update ' + str(training_id) for training_id in training_ids], ncols=1))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
-	elif msg['text'] == '/set_training':
+	elif msg['text'].startswith('/set_training'):
 		if user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to set training.")
 		elif chat_id in [TITANS_CHAT_ID, EXCO_CHAT_ID]:
@@ -55,7 +55,7 @@ def on_chat_message(msg):
 			training_types = ['Training', 'OTOT']
 			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(training_types, callback_data_list=['/set_training ' + training_type for training_type in training_types], ncols=2))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a training type', reply_markup = markup))
-	elif msg['text'] == '/can_go':
+	elif msg['text'].startswith('/can_go'):
 		if msg['chat']['type'] != 'private':
 			bot.sendMessage(chat_id, "Please click on me (@ke_cheer_bot) and send your reply there instead.")
 		else:
@@ -68,7 +68,7 @@ def on_chat_message(msg):
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
 			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/can_go ' + str(training_id) for training_id in training_ids], ncols=1))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
-	elif msg['text'] == '/cant_go':
+	elif msg['text'].startswith('/cant_go'):
 		if msg['chat']['type'] != 'private':
 			bot.sendMessage(chat_id, "Please click on me (@ke_cheer_bot) and send your reply there instead.")
 		else:
