@@ -183,7 +183,8 @@ def on_callback_query(msg):
 		# edit_previous_temp_message_id(from_id, 'Training date is chosen.')
 		bot.answerCallbackQuery(query_id, text='Training date is chosen.')
 		training_id = query_data.split(' ')[1]
-		training_details = db.find_training(training_id)[0]
+		training_details = db.find_training(training_id)
+		training_details = training_details[0] if len(training_details) > 0 else ('this', 'is', 'a', 'place', 'holder') 
 		attendances = db.get_attendances(training_id)
 		no_reply_user_ids = db.get_no_reply_user_ids(training_id)
 		bot.sendMessage(EXCO_CHAT_ID, training.get_attendance_details(db, training_details, attendances, no_reply_user_ids))
