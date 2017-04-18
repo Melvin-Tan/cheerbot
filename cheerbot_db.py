@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 class Cheerbot_DB:
 	def __init__(self, db_name = 'cheerbot.sqlite'):
@@ -54,8 +55,16 @@ class Cheerbot_DB:
 		return [x for x in self.conn.execute(statement, args)]
 
 	def get_upcoming_trainings(self):
-		statement = "SELECT * FROM trainings WHERE datetime('now') < end_datetime ORDER BY start_datetime"
-		return [x for x in self.conn.execute(statement)]
+		datetime_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		statement = "SELECT * FROM trainings WHERE (?) < start_datetime ORDER BY start_datetime"
+		args = (datetime_now,)
+		return [x for x in self.conn.execute(statement, args)]
+
+	def get_current_and_upcoming_trainings(self):
+		datetime_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		statement = "SELECT * FROM trainings WHERE (?) < end_datetime ORDER BY start_datetime"
+		args = (datetime_now,)
+		return [x for x in self.conn.execute(statement, args)]
 
 	def find_user(self, user_id):
 		statement = 'SELECT * FROM users WHERE user_id = (?) LIMIT 1'

@@ -49,7 +49,7 @@ def on_chat_message(msg):
 		else:
 			# Prompt them to select a date (buttons)
 			# Give attendance for that date
-			upcoming_trainings = db.get_upcoming_trainings()
+			upcoming_trainings = db.get_current_and_upcoming_trainings()
 			if len(upcoming_trainings) == 0:
 				bot.sendMessage(chat_id, 'No available trainings leh...')
 				return
