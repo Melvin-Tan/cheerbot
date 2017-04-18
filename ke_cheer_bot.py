@@ -16,6 +16,19 @@ import training
 # Click on the link
 # Press start
 
+"""
+# Only for deployment to PythonAnywhere
+
+import urllib3
+# You can leave this bit out if you're using a paid PythonAnywhere account
+proxy_url = "http://proxy.server:3128"
+telepot.api._pools = {
+    'default': urllib3.ProxyManager(proxy_url=proxy_url, num_pools=3, maxsize=10, retries=False, timeout=30),
+}
+telepot.api._onetime_pool_spec = (urllib3.ProxyManager, dict(proxy_url=proxy_url, num_pools=1, maxsize=1, retries=False, timeout=30))
+# end of the stuff that's only needed for free accounts
+"""
+
 bot = telepot.Bot('379881150:AAG2jacR7YBD_t2lc1v4RogoR-RCe09z6PU')
 EXCO_CHAT_ID = -219149765
 TITANS_CHAT_ID = -198395968
