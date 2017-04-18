@@ -34,7 +34,7 @@ def get_no_reply_members(db, no_reply_user_ids):
 	list_index = 1
 	for user_id in no_reply_user_ids:
 		user = db.find_user(user_id[0])[0]
-		result += str(list_index) + '. ' + user[2] + '(@' + user[1] + ')\n'
+		result += str(list_index) + '. ' + user[2] + ' (@' + user[1] + ')\n'
 		list_index += 1
 	return result if list_index > 1 else 'None\n'
 

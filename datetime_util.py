@@ -1,4 +1,5 @@
 import datetime
+import pytz
 
 """
 Args example format
@@ -7,6 +8,10 @@ month: 'Jul'
  year: 2017
  time: '2030'
 """
+
+def get_now():
+	datetime_now = datetime.datetime.now(pytz.timezone('Asia/Singapore'))
+	return datetime_now.strftime('%Y-%m-%d %H:%M:%S')
 
 # Convert UNIX date to human-readable datetime string
 def get_local_datetime(unix_date):
