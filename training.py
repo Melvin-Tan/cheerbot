@@ -29,6 +29,14 @@ def get_attendance_details(db, training, attendances, no_reply_user_ids):
 		+ 'Coming:\n' \
 		+ get_coming_members(db, attendances)
 
+def get_reminder_details(db, training, no_reply_user_ids):
+	return 'REMINDER\n\n' + training[4] + ' on ' + get_datetime(training) + ' in ' + training[1] + '\n\n' \
+		+ 'Come down 15 minutes earlier to set up mats thanks!\n\n' \
+		+ "Lastly, for those who haven't reply:\n" \
+		+ get_no_reply_members(db, no_reply_user_ids) \
+		+ 'Do remember to indicate attendance by clicking on me (@ke_cheer_bot) and type /can_go or /cant_go.\n\n'
+		+ 'Cya on the mats! :D'
+
 def get_no_reply_members(db, no_reply_user_ids):
 	result = ''
 	list_index = 1
@@ -36,7 +44,7 @@ def get_no_reply_members(db, no_reply_user_ids):
 		user = db.find_user(user_id[0])[0]
 		result += str(list_index) + '. ' + user[2] + ' (@' + user[1] + ')\n'
 		list_index += 1
-	return result if list_index > 1 else 'None\n'
+	return result if list_index > 1 else 'All replied, yay!\n'
 
 def get_coming_members(db, attendances):
 	result = ''

@@ -57,6 +57,20 @@ def on_chat_message(msg):
 			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
 			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/update ' + str(training_id) for training_id in training_ids], ncols=1))
 			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
+	elif msg['text'].startswith('/remind'):
+		if user_id != CAPTAIN_USER_ID:
+			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to remind.")
+		else:
+			# Prompt them to select a date (buttons)
+			# Remind titans main chat for that date
+			upcoming_trainings = db.get_upcoming_trainings()
+			if len(upcoming_trainings) == 0:
+				bot.sendMessage(chat_id, 'No available trainings leh...')
+				return
+			dates = [training.get_datetime(upcoming_training) for upcoming_training in upcoming_trainings]
+			training_ids = [upcoming_training[0] for upcoming_training in upcoming_trainings]
+			markup = InlineKeyboardMarkup(inline_keyboard=keyboard_formatter.format(dates, callback_data_list=['/remind ' + str(training_id) for training_id in training_ids], ncols=1))
+			temp_messages.append(bot.sendMessage(chat_id, 'Please choose a date', reply_markup = markup))
 	elif msg['text'].startswith('/set_training'):
 		if user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to set training.")
@@ -201,6 +215,13 @@ def on_callback_query(msg):
 		attendances = db.get_attendances(training_id)
 		no_reply_user_ids = db.get_no_reply_user_ids(training_id)
 		bot.sendMessage(EXCO_CHAT_ID, training.get_attendance_details(db, training_details, attendances, no_reply_user_ids))
+	elif query_data.startswith('/remind'):
+		bot.answerCallbackQuery(query_id, text='Training date is chosen.')
+		training_id = query_data.split(' ')[1]
+		training_details = db.find_training(training_id)
+		training_details = training_details[0] if len(training_details) > 0 else ('this', 'is', 'a', 'place', 'holder') 
+		no_reply_user_ids = db.get_no_reply_user_ids(training_id)
+		bot.sendMessage(TITANS_CHAT_ID, training.get_reminder_details(db, training_details, no_reply_user_ids))
 
 def edit_previous_temp_message_id(from_id, new_text):
 	message = get_previous_temp_message(from_id)
