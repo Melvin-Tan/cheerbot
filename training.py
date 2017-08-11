@@ -34,7 +34,7 @@ def get_reminder_details(db, training, no_reply_user_ids):
 		+ 'Come down 15 minutes earlier to set up mats thanks!\n\n' \
 		+ "Lastly, for those who haven't reply:\n" \
 		+ get_no_reply_members(db, no_reply_user_ids) \
-		+ 'Do remember to indicate attendance by clicking on me (@ke_cheer_bot) and type /can_go or /cant_go.\n\n'
+		+ 'Do remember to indicate attendance by clicking on me (@ke_cheer_bot) and type /can_go or /cant_go.\n\n' \
 		+ 'Cya on the mats! :D'
 
 def get_no_reply_members(db, no_reply_user_ids):
