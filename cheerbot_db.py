@@ -143,8 +143,7 @@ class Cheerbot_DB:
               SET admin = %(admin)s
               WHERE user_id = %(user_id)s;
               """
-        admin = 1 if is_admin else 0
-        data = {'admin': admin,
+        data = {'admin': is_admin,
                 'user_id': user_id}
         self.mutate(sql, data)
 
@@ -156,11 +155,10 @@ class Cheerbot_DB:
         data = {'user_id': user_id,
                 'user_name': user_name,
                 'name': name,
-                'admin': admin}
+                'admin': False}
         self.mutate(sql, data)
 
     def add_or_update_user(self, msg):
-        print(msg)
         chat = msg['chat']
         user_id = chat['id']
         user_name = chat['username'] if 'username' in chat else ''
@@ -231,7 +229,7 @@ class Cheerbot_DB:
         # reason = ' '.join(msg['data'].split(' ')[2:])
 
         # Handle user
-        self.add_or_update_user(msg)
+        self.add_or_update_user(msg['message'])
 
         # Handle attendance
         user_id = msg['message']['chat']['id']
@@ -239,8 +237,3 @@ class Cheerbot_DB:
             self.add_attendance(training_id, user_id, can_attend)
         else:
             self.update_attendance(training_id, user_id, can_attend)
-
-db = Cheerbot_DB()
-db.setup()
-print(db.query("SELECT * FROM users"))
-print(db.get_new_training_id())
