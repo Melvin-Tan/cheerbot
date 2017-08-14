@@ -66,7 +66,7 @@ class Cheerbot_DB:
               SELECT MAX(training_id)
               FROM trainings;
               """
-        latest_training_id = self.conn.cursor.execute(sql)
+        latest_training_id = self.conn.cursor().execute(sql)
         print(latest_training_id)
         return latest_training_id + 1 if latest_training_id else 1
 
