@@ -69,7 +69,7 @@ class Cheerbot_DB:
         return self.query(sql)[0][0] + 1
 
     def add_training(self, venue, start_datetime, end_datetime, training_type):
-        training_id = self.get_table_size('trainings') + 1
+        training_id = self.get_new_training_id()
         sql = """
               INSERT INTO trainings (training_id, venue, start_datetime, end_datetime, training_type)
               VALUES (%(training_id)s, %(venue)s, %(start_datetime)s, %(end_datetime)s, %(training_type)s);
@@ -234,4 +234,4 @@ class Cheerbot_DB:
 
 db = Cheerbot_DB()
 db.setup()
-print(db.get_new_training_id('trainings'))
+print(db.get_new_training_id())
