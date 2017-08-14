@@ -31,7 +31,7 @@ class Cheerbot_DB:
     def setup(self):
         self.mutate(
             """
-            CREATE TABLE trainings (
+            CREATE TABLE IF NOT EXISTS trainings (
                 training_id integer,
                 venue text,
                 start_datetime timestamp,
@@ -42,7 +42,7 @@ class Cheerbot_DB:
         )
         self.mutate(
             """
-            CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                 user_id integer,
                 user_name text,
                 name text,
@@ -52,7 +52,7 @@ class Cheerbot_DB:
         )
         self.mutate(
             """
-            CREATE TABLE attendances (
+            CREATE TABLE IF NOT EXISTS attendances (
                 training_id integer,
                 user_id integer,
                 coming boolean,
@@ -66,7 +66,9 @@ class Cheerbot_DB:
               SELECT MAX(training_id)
               FROM trainings;
               """
-        return self.query(sql)[0][0] + 1
+        latest_training_id = self.query(sql)
+        print(latest_training_id)
+        return latest_training_id + 1 if latest_training_id else 1
 
     def add_training(self, venue, start_datetime, end_datetime, training_type):
         training_id = self.get_new_training_id()
