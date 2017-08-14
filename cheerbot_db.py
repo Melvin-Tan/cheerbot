@@ -23,7 +23,7 @@ class Cheerbot_DB:
             CREATE TABLE IF NOT EXISTS trainings (
                 training_id integer,
                 venue text,
-                start_datetime datetime,
+                start_datetime timestamp,
                 end_datetime datetime,
                 training_type text
             );
