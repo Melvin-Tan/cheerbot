@@ -233,3 +233,7 @@ class Cheerbot_DB:
             self.add_attendance(training_id, user_id, can_attend)
         else:
             self.update_attendance(training_id, user_id, can_attend)
+
+db = Cheerbot_DB()
+db.setup()
+print(db.get_table_size('training'))

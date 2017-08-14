@@ -235,16 +235,10 @@ def get_previous_temp_message(from_id):
 	message_by_user = messages_by_user[0]
 	return message_by_user
 
-if __name__ == '__main__':
-	try:
-		# Constantly receives messages and handle it
-		bot.message_loop({'chat': on_chat_message, 'callback_query': on_callback_query})
 
-		# Keep the program running
-		while 1:
-		    time.sleep(10)
-	except Exception as e:
-		print(e)
+# Constantly receives messages and handle it
+bot.message_loop({'chat': on_chat_message, 'callback_query': on_callback_query})
 
-
-
+# Keep the program running
+while 1:
+    time.sleep(10)
