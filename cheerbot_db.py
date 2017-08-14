@@ -8,16 +8,28 @@ class Cheerbot_DB:
     def __init__(self):
         self.conn = psycopg2.connect(DATABASE_URL)
 
+    def query(self, sql, data = ()):
+        try:
+            cur = self.conn.cursor()
+            return [x for x in cur.execute(sql, data).fetchall()]
+        except Exception as e:
+            print(e)
+
+    def mutate(self, sql, data = ()):
+        try:
+            cur = self.conn.cursor()
+            cur.execute(sql, data)
+            self.conn.commit()
+        except Exception as e:
+            print(e)
+
     def drop_tables(self):
-        cur = self.conn.cursor()
-        cur.execute('DROP TABLE IF EXISTS trainings')
-        cur.execute('DROP TABLE IF EXISTS users')
-        cur.execute('DROP TABLE IF EXISTS attendances')
-        self.conn.commit()
+        self.mutate('DROP TABLE IF EXISTS trainings')
+        self.mutate('DROP TABLE IF EXISTS users')
+        self.mutate('DROP TABLE IF EXISTS attendances')
 
     def setup(self):
-        cur = self.conn.cursor()
-        cur.execute(
+        self.mutate(
             """
             CREATE TABLE IF NOT EXISTS trainings (
                 training_id integer,
@@ -28,7 +40,7 @@ class Cheerbot_DB:
             );
             """
         )
-        cur.execute(
+        self.mutate(
             """
             CREATE TABLE IF NOT EXISTS users (
                 user_id integer,
@@ -38,7 +50,7 @@ class Cheerbot_DB:
             );
             """
         )
-        cur.execute(
+        self.mutate(
             """
             CREATE TABLE IF NOT EXISTS attendances (
                 training_id integer,
@@ -48,8 +60,6 @@ class Cheerbot_DB:
             );
             """
         )
-        self.conn.commit()
-        print("setup")
 
     def get_table_size(self, table):
         sql = """
@@ -71,9 +81,7 @@ class Cheerbot_DB:
                 'start_datetime': start_datetime,
                 'end_datetime': end_datetime,
                 'training_type': training_type}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def find_training(self, training_id):
         sql = """
@@ -83,8 +91,7 @@ class Cheerbot_DB:
               LIMIT 1;
               """
         data = {'training_id': training_id}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def get_upcoming_trainings(self):
         datetime_now = datetime_util.get_now()
@@ -95,8 +102,7 @@ class Cheerbot_DB:
               ORDER BY start_datetime;
               """
         data = {'datetime_now' : datetime_now}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def get_current_and_upcoming_trainings(self):
         datetime_now = datetime_util.get_now()
@@ -107,8 +113,7 @@ class Cheerbot_DB:
               ORDER BY start_datetime;
               """
         data = {'datetime_now' : datetime_now}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def find_user(self, user_id):
         sql = """
@@ -117,9 +122,8 @@ class Cheerbot_DB:
               WHERE user_id = %(user_id)s
               LIMIT 1;
               """
-        statement = 'SELECT * FROM users WHERE user_id = (?) LIMIT 1'
         data = {'user_id': user_id}
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def update_user_info(self, user_id, user_name, name):
         sql = """
@@ -130,9 +134,7 @@ class Cheerbot_DB:
         data = {'user_name': user_name,
                 'user_id': user_id,
                 'name': name}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def set_user_access(self, user_id, is_admin):
         sql = """
@@ -143,9 +145,7 @@ class Cheerbot_DB:
         admin = 1 if is_admin else 0
         args = {'admin': admin,
                 'user_id': user_id}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def add_user(self, user_id, user_name, name):
         sql = """
@@ -156,9 +156,7 @@ class Cheerbot_DB:
                 'user_name': user_name,
                 'name': name,
                 'admin': admin}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def add_or_update_user(self, user_id, user_name, name):
         if len(self.find_user(user_id)) == 0:
@@ -175,8 +173,7 @@ class Cheerbot_DB:
               """
         data = {'training_id': training_id,
                 'user_id': user_id}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def get_attendances(self, training_id):
         sql = """
@@ -186,8 +183,7 @@ class Cheerbot_DB:
               ORDER BY coming
               """
         data = {'training_id': training_id}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def get_no_reply_user_ids(self, training_id):
         sql = """
@@ -199,8 +195,7 @@ class Cheerbot_DB:
               WHERE training_id = %(training_id)s
               """
         data = {'training_id': training_id}
-        cur = self.conn.cursor()
-        return [x for x in cur.execute(sql, data).fetchall()]
+        return self.query(sql, data)
 
     def add_attendance(self, training_id, user_id, coming):
         sql = """
@@ -210,9 +205,7 @@ class Cheerbot_DB:
         data = {'training_id': training_id,
                 'user_id': user_id,
                 'coming': coming}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def update_attendance(self, training_id, user_id, coming):
         sql = """
@@ -223,9 +216,7 @@ class Cheerbot_DB:
         data = {'training_id': training_id,
                 'user_id': user_id,
                 'coming': coming}
-        cur = self.conn.cursor()
-        cur.execute(sql, data)
-        self.conn.commit()
+        self.mutate(sql, data)
 
     def add_or_update_attendance(self, msg):
         can_attend = 1 if msg['data'].startswith('/can_go') else 0
@@ -242,7 +233,3 @@ class Cheerbot_DB:
             self.add_attendance(training_id, user_id, can_attend)
         else:
             self.update_attendance(training_id, user_id, can_attend)
-
-db = Cheerbot_DB()
-db.setup()
-print(db.get_table_size('trainings'))
