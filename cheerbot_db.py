@@ -11,7 +11,7 @@ class Cheerbot_DB:
     def query(self, sql, data = ()):
         try:
             cur = self.conn.cursor()
-            return [x for x in cur.execute(sql, data).fetchall()]
+            return cur.execute(sql, data).fetchall()
         except Exception as e:
             print(e)
 
@@ -158,7 +158,12 @@ class Cheerbot_DB:
                 'admin': admin}
         self.mutate(sql, data)
 
-    def add_or_update_user(self, user_id, user_name, name):
+    def add_or_update_user(self, msg):
+        chat = msg['message']['chat']
+        user_id = chat['id']
+        user_name = chat['username'] if 'username' in chat else ''
+        name = chat['first_name'] if 'first_name' in chat else ''
+
         if len(self.find_user(user_id)) == 0:
             self.add_user(user_id, user_name, name)
         else:
@@ -222,13 +227,12 @@ class Cheerbot_DB:
         can_attend = 1 if msg['data'].startswith('/can_go') else 0
         training_id = msg['data'].split(' ')[1]
         # reason = ' '.join(msg['data'].split(' ')[2:])
+
         # Handle user
-        chat = msg['message']['chat']
-        user_id = chat['id']
-        user_name = chat['username'] if 'username' in chat else ''
-        name = chat['first_name'] if 'first_name' in chat else ''
-        self.add_or_update_user(user_id, user_name, name)
+        self.add_or_update_user(msg)
+
         # Handle attendance
+        user_id = msg['message']['chat']['id']
         if len(self.find_attendance(training_id, user_id)) == 0:
             self.add_attendance(training_id, user_id, can_attend)
         else:
