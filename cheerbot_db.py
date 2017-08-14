@@ -160,7 +160,7 @@ class Cheerbot_DB:
 
     def add_or_update_user(self, msg):
         print(msg)
-        chat = msg['message']['chat']
+        chat = msg['chat']
         user_id = chat['id']
         user_name = chat['username'] if 'username' in chat else ''
         name = chat['first_name'] if 'first_name' in chat else ''
