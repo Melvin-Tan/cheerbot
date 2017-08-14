@@ -7,7 +7,6 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 class Cheerbot_DB:
     def __init__(self):
         self.conn = psycopg2.connect(DATABASE_URL)
-        print('connected')
 
     def drop_tables(self):
         cur = self.conn.cursor()
@@ -24,7 +23,7 @@ class Cheerbot_DB:
                 training_id integer,
                 venue text,
                 start_datetime timestamp,
-                end_datetime datetime,
+                end_datetime timestamp,
                 training_type text
             );
             """
