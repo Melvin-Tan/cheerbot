@@ -236,4 +236,4 @@ class Cheerbot_DB:
 
 db = Cheerbot_DB()
 db.setup()
-print(db.get_table_size('training'))
+print(db.get_table_size('trainings'))
