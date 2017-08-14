@@ -11,7 +11,8 @@ class Cheerbot_DB:
     def query(self, sql, data = ()):
         try:
             cur = self.conn.cursor()
-            return cur.execute(sql, data).fetchall()
+            cur.execute(sql, data)
+            return cur.fetchall()
         except Exception as e:
             print(e)
 
