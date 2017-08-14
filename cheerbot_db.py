@@ -68,7 +68,7 @@ class Cheerbot_DB:
               """
         data = {'table': table}
         cur = self.conn.cursor()
-        return cur.execute(statement).fetchone()[0]
+        return cur.execute(sql, data).fetchone()[0]
 
     def add_training(self, venue, start_datetime, end_datetime, training_type):
         training_id = self.get_table_size('trainings') + 1
@@ -143,7 +143,7 @@ class Cheerbot_DB:
               WHERE user_id = %(user_id)s;
               """
         admin = 1 if is_admin else 0
-        args = {'admin': admin,
+        data = {'admin': admin,
                 'user_id': user_id}
         self.mutate(sql, data)
 
