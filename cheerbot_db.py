@@ -234,4 +234,5 @@ class Cheerbot_DB:
 
 db = Cheerbot_DB()
 db.setup()
+print(db.query("SELECT * from trainings"))
 print(db.get_new_training_id())
