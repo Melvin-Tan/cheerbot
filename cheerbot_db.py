@@ -61,14 +61,12 @@ class Cheerbot_DB:
             """
         )
 
-    def get_table_size(self, table):
+    def get_new_training_id(self):
         sql = """
-              SELECT COUNT(*)
-              FROM %(table)s;
+              SELECT MAX(training_id)
+              FROM trainings;
               """
-        data = {'table': table}
-        cur = self.conn.cursor()
-        return cur.execute(sql, data).fetchone()[0]
+        return self.query(sql)[0][0] + 1
 
     def add_training(self, venue, start_datetime, end_datetime, training_type):
         training_id = self.get_table_size('trainings') + 1
