@@ -43,7 +43,7 @@ def on_chat_message(msg):
 	# pprint(msg)
 	user_id = msg['from']['id']
 	chat_id = msg['chat']['id']
-	add_or_update_user(msg)
+	db.add_or_update_user(msg)
 	if msg['text'].startswith('/update'):
 		if chat_id != EXCO_CHAT_ID and user_id != CAPTAIN_USER_ID:
 			bot.sendMessage(chat_id, "OI " + msg['from']['first_name'] + " mai lai. No permission to see.")
