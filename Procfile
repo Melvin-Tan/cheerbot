@@ -1,1 +1,1 @@
-worker: python cheerbot_db.py
+worker: python ke_cheer_bot.py

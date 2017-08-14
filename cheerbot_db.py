@@ -236,5 +236,5 @@ class Cheerbot_DB:
 
 db = Cheerbot_DB()
 db.setup()
-print(db.query("SELECT * from trainings") if db.query("SELECT * from trainings") else 'NO ENTRY!')
+print(db.query("SELECT * FROM users"))
 print(db.get_new_training_id())
