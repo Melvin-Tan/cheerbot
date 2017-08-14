@@ -31,7 +31,7 @@ class Cheerbot_DB:
     def setup(self):
         self.mutate(
             """
-            CREATE TABLE IF NOT EXISTS trainings (
+            CREATE TABLE trainings (
                 training_id integer,
                 venue text,
                 start_datetime timestamp,
@@ -42,7 +42,7 @@ class Cheerbot_DB:
         )
         self.mutate(
             """
-            CREATE TABLE IF NOT EXISTS users (
+            CREATE TABLE users (
                 user_id integer,
                 user_name text,
                 name text,
@@ -52,7 +52,7 @@ class Cheerbot_DB:
         )
         self.mutate(
             """
-            CREATE TABLE IF NOT EXISTS attendances (
+            CREATE TABLE attendances (
                 training_id integer,
                 user_id integer,
                 coming boolean,
